@@ -19,6 +19,7 @@ router.post("/chat", async (req, res) => {
       frequency_penalty: 0,
       presence_penalty: 0,
     });
+    res.send(response);
   } catch (err) {
     res.status(500).send(err);
   }
