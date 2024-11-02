@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
 
 require("dotenv").config();
@@ -11,9 +12,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
 
-app.post("/data", (req, res) => {
-  const { name, email } = req.body;
-  res.json({ message: `Hello, ${name}! Your email is ${email}.` });
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
+app.post("/generate", async (req, res) => {
+  const { prompt } = req.body;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+
+    res.json({ response: result.response.text() });
+  } catch (error) {
+    res.status(500).json({ error: "Error generating content" });
+  }
 });
 
 // Start Server
